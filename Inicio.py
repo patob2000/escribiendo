@@ -16,6 +16,10 @@ st.set_page_config(
     }
 )
 
+
+if 'respuesta' not in st.session_state:
+    st.session_state['respuesta'] = ''
+
 def read_text_file(file_path):
     with open(file_path, "r", encoding='utf-8') as file:
         data = file.read()
