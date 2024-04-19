@@ -35,17 +35,16 @@ def text_to_speech_openai(text, voice):
 
 
 
-#claude-3-opus-20240229
+
 from anthropic import Anthropic
-def procesar_solicitud_anthropic(system,user):
+def procesar_solicitud_anthropic(prompt):
     client = Anthropic()
     response = client.messages.create(
-        system=system,
         max_tokens=1024,
         messages=[
             {
                 "role": "user",
-                "content": user,
+                "content": prompt,
             }
         ],
         model="claude-3-haiku-20240307",
@@ -106,7 +105,4 @@ def consulta_sql(consulta):
         # En caso de error, imprimir el mensaje de error y retornar None
         print(f"Error al ejecutar consulta SQL: {e}")
         return None
-
-
-
 
