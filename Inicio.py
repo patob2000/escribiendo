@@ -1,8 +1,12 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
+import streamlit_shadcn_ui as ui
 import os
 from funciones import procesar_solicitud_anthropic
+import anthropic
 
+
+       
 
 st.set_page_config(
     page_title="Consejos para escribir un ebook con IA",
@@ -17,8 +21,7 @@ st.set_page_config(
 )
 
 
-if 'respuesta' not in st.session_state:
-    st.session_state['respuesta'] = ''
+
 
 def read_text_file(file_path):
     with open(file_path, "r", encoding='utf-8') as file:
@@ -27,7 +30,7 @@ def read_text_file(file_path):
 
 
 with st.sidebar:
-    selected = option_menu("Índice", ["Prefacio","Contenido de Calidad", 'Originalidad','Conflicto Ético','Audiencia Objetivo','Limita la Creatividad','Reputación Dañada','Barrera Tecnológica','Derechos de Autor','Personalización','Mercado Inmaduro','Contenido Único','Asistente'], 
+    selected = option_menu("Índice", ["Prefacio","Contenido de Calidad", 'Originalidad','Conflicto Ético','Audiencia Objetivo','Limita la Creatividad','Reputación Dañada','Barrera Tecnológica','Derechos de Autor','Personalización','Mercado Inmaduro','Contenido Único','Asistente','FAQ'], 
         icons=['caret-right', 'caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','bi-robot'], default_index=0)
 
 
@@ -78,20 +81,59 @@ with open(archivo_salida, 'r', encoding='utf-8') as file_handle:
      texto_archivo_salida = file_handle.read()
 
 
+if 'respuesta' not in st.session_state:
+    st.session_state['respuesta'] = ''
+
+def anthropic_stream(system, user_input):
+    st.session_state['respuesta']=''
+    client = anthropic.Anthropic()
+    prompt_final = system + " "+user_input
+    # Crea el stream usando el cliente de Anthropic
+    with client.messages.stream(
+        max_tokens=4096,
+        messages=[{"role": "user", "content": prompt_final}],
+        model="claude-3-haiku-20240307",
+    ) as stream:
+        # Itera sobre cada texto que llega del stream
+        for text in stream.text_stream:
+            st.session_state['respuesta'] += text
+            yield text
+
+def stream_to_app(system, user_input):
+    # Función que pasa el generador a Streamlit para mostrar en la aplicación
+    st.write_stream(anthropic_stream(system, user_input))
+
 # Asegurarse de que texto_archivo_salida tiene contenido válido
-prompt_system = f"""Eres un asistente que responde preguntas únicamente y exclusivamante relacionadas con la escritura de libros usando inteligencia artificial.
-Utiliza negritas , cursiva y otros recursos para hacer el texto legible.
-Utiliza el siguiente contenido para fundamentar y apoyar tus respuestas:
+prompt_system = f"""Utiliza el siguiente contenido para fundamentar y apoyar tus respuestas:
 {texto_archivo_salida}"""  
 
 
 
 
 
+
 if selected == "Asistente":
+    if 'respuesta' not in st.session_state:
+        st.session_state['respuesta'] = ''
+    else:
+        if st.session_state['respuesta'] != "":
+            with st.chat_message("assistant"):
+                 st.write(st.session_state['respuesta'])
+
     prompt = st.chat_input("Tu Pregunta")
     if prompt:
-        with st.spinner("Espera ..."):
-            respuesta = procesar_solicitud_anthropic(prompt_system,prompt)
-            st.session_state['respuesta'] = respuesta
-st.write( st.session_state['respuesta'] )
+        with st.chat_message("user"):
+            st.write(prompt)
+        with st.chat_message("assistant"):
+            stream_to_app(prompt_system,prompt)
+
+
+
+#if selected == "FAQ":
+#    st.write("Pronto Disponible ...")
+
+
+
+
+
+
