@@ -3,3 +3,4 @@ streamlit==1.33.0
 streamlit-shadcn-ui==0.1.18
 anthropic==0.18.1
 streamlit-option-menu==0.3.12
+psycopg2-binary==2.9.9
