@@ -30,8 +30,8 @@ def read_text_file(file_path):
 
 
 with st.sidebar:
-    selected = option_menu("Índice", ["Prefacio","Contenido de Calidad", 'Originalidad','Conflicto Ético','Audiencia Objetivo','Limita la Creatividad','Reputación Dañada','Barrera Tecnológica','Derechos de Autor','Personalización','Mercado Inmaduro','Contenido Único','Asistente','FAQ'], 
-        icons=['caret-right', 'caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','bi-robot'], default_index=0)
+    selected = option_menu("Índice", ["Prefacio","Contenido de Calidad", 'Originalidad','Conflicto Ético','Audiencia Objetivo','Limita la Creatividad','Reputación Dañada','Barrera Tecnológica','Derechos de Autor','Personalización','Mercado Inmaduro','Contenido Único'], 
+        icons=['caret-right', 'caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right','caret-right'], default_index=0)
 
 
 fileaudio = selected + ".mp3"
